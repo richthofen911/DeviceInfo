@@ -2,19 +2,21 @@ package callofdroidy.net.deviceinfo;
 
 import android.content.res.Resources;
 import android.graphics.Point;
-import android.support.v4.text.TextUtilsCompat;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
 
     Resources resources;
 
-    TextView tvInfo;
+    TextView tvInfoScreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,19 +24,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         resources = getResources();
-        tvInfo = (TextView) findViewById(R.id.tv_info);
+        tvInfoScreen = (TextView) findViewById(R.id.tv_info_screen);
 
         DisplayMetrics displayMetrics = resources.getDisplayMetrics();
 
         float density = displayMetrics.density;
         int widthInPx = displayMetrics.widthPixels;
+
         int statusBarHeightInPx = getStatusBarHeight(resources);
         int navBarHeightInPx = getNavigationBarHeight(resources);
 
         Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getRealSize(size);
-        int fullHeightInPx = size.y;
+        Point realSize = new Point();
+        display.getRealSize(realSize);
+        int fullHeightInPx = realSize.y;
+
+        Point displaySize = new Point();
+        display.getSize(displaySize);
+        Log.e(TAG, "onCreate: displaySize height: " + displaySize.y);
+
         int heightDimenPx = fullHeightInPx - statusBarHeightInPx - navBarHeightInPx;
 
         String info = TextUtils.concat(
@@ -45,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
                         "navBarInDp:\t\t\t\t\t" + navBarHeightInPx / density + "\n" +
                         "widthInPx:\t\t\t\t\t\t\t" + widthInPx + "\n" +
                         "widthInDp:\t\t\t\t\t\t\t" + widthInPx / density + "\n" +
-                        "heightFullPx:\t\t\t\t" + size.y + "\n" +
-                        "heightFullDp:\t\t\t\t" + size.y / density + "\n" +
+                        "heightFullPx:\t\t\t\t" + realSize.y + "\n" +
+                        "heightFullDp:\t\t\t\t" + realSize.y / density + "\n" +
                         "heightDimenPx:\t\t" + heightDimenPx + "　(full-statusBar-navBar)\n" +
                         "heightDimenDp:\t\t" + heightDimenPx / density + "　(full-statusBar-navBar)\n" +
                         "heightMainPx:\t\t\t" + (heightDimenPx - 48 * density) + "　(toolbar height 48dp)\n" +
@@ -54,7 +62,9 @@ public class MainActivity extends AppCompatActivity {
 
         ).toString();
 
-        tvInfo.setText(info);
+        tvInfoScreen.setText(info);
+
+
     }
 
     public int getStatusBarHeight(Resources resources) {

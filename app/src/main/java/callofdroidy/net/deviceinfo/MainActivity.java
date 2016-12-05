@@ -1,31 +1,67 @@
 package callofdroidy.net.deviceinfo;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
-import android.os.Build;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MainActivity";
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+    private static final String TAG = "GuestMainActivity";
+
+    private Context hostContext;
 
     Resources resources;
 
     TextView tvInfoScreen;
+    Button btnSee;
+
+
+    public MainActivity(){
+        super();
+        Log.e(TAG, "Constructor: no param");
+    }
+
+    public MainActivity(Context hostContext){
+        super();
+        this.hostContext = hostContext;
+        Log.e(TAG, "Constructor: with param");
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        if(hostContext != null) {
+            Log.e(TAG, "onCreate, custom procedure");
+            resources = hostContext.getResources();
+            Log.e(TAG, "onCreate: host get resources"); // arrive here
+            tvInfoScreen = (TextView) ((Activity)hostContext).findViewById(PluginIds.getTextViewId());
+            Log.e(TAG, "onCreate: getTextViewId");
+            btnSee = (Button) ((Activity)hostContext).findViewById(R.id.btn_see);
+            btnSee.setOnClickListener(this);
+        } else{
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.plugin_layout);
 
-        resources = getResources();
-        tvInfoScreen = (TextView) findViewById(R.id.tv_info_screen);
+            resources = getResources();
+            tvInfoScreen = (TextView) findViewById(R.id.tv_info_screen);
+            btnSee = (Button) findViewById(R.id.btn_see);
+            btnSee.setOnClickListener(this);
+        }
+    }
 
+    private String getDeviceScreenInfo(){
         DisplayMetrics displayMetrics = resources.getDisplayMetrics();
 
         float density = displayMetrics.density;
@@ -45,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
         int heightDimenPx = fullHeightInPx - statusBarHeightInPx - navBarHeightInPx;
 
-        String info = TextUtils.concat(
+        return TextUtils.concat(
                 "density:\t\t\t\t" + density + "\n" +
                         "statusBarInPx:\t\t\t" + statusBarHeightInPx + "\n" +
                         "statusBarInDp:\t\t\t" + statusBarHeightInPx / density + "\n" +
@@ -61,10 +97,6 @@ public class MainActivity extends AppCompatActivity {
                         "heightMainDp:\t\t\t" + (heightDimenPx - 48 * density) / density + "　(toolbar height 48dp)\n"
 
         ).toString();
-
-        tvInfoScreen.setText(info);
-
-
     }
 
     public int getStatusBarHeight(Resources resources) {
@@ -82,4 +114,13 @@ public class MainActivity extends AppCompatActivity {
         }
         return 0;
     }
+
+
+    @Override
+    public void onClick(View view){
+        if(view.getId() == btnSee.getId()){
+            tvInfoScreen.setText(getDeviceScreenInfo());
+        }
+    }
+
 }

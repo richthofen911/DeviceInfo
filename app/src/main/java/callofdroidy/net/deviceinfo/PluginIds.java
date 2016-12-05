@@ -6,6 +6,12 @@ package callofdroidy.net.deviceinfo;
 
 public class PluginIds {
     public static int getMainLayoutId(){
-        return R.layout.activity_main;
+        return R.layout.plugin_layout;
+    }
+    public static int getTextViewId(){
+        return R.id.tv_info_screen;
+    }
+    public static int getButtonId(){
+        return R.id.btn_see;
     }
 }
